@@ -23,6 +23,7 @@ jobs:
           import base64
           import io
           import shutil
+          import textwrap
           import zipfile
           from pathlib import Path
 
@@ -41,7 +42,6 @@ jobs:
                   'package.json',
                   'index.html',
                   'vite.config.js',
-                  '.github/workflows/pages.yml',
                   'src/App.jsx',
                   'src/main.jsx',
                   'src/storage/schema.js',
@@ -61,6 +61,57 @@ jobs:
                       child.unlink()
 
               archive.extractall(root)
+
+          pages_workflow = textwrap.dedent('''\
+          name: Deploy IronLog to GitHub Pages
+
+          on:
+            push:
+              branches: [main]
+            workflow_dispatch:
+
+          permissions:
+            contents: read
+            pages: write
+            id-token: write
+
+          concurrency:
+            group: pages
+            cancel-in-progress: true
+
+          jobs:
+            build:
+              runs-on: ubuntu-latest
+              steps:
+                - name: Checkout
+                  uses: actions/checkout@v4
+                - name: Setup Node
+                  uses: actions/setup-node@v4
+                  with:
+                    node-version: 22
+                - name: Install
+                  run: npm install
+                - name: Build
+                  run: npm run build
+                - name: Upload artifact
+                  uses: actions/upload-pages-artifact@v3
+                  with:
+                    path: dist
+            deploy:
+              environment:
+                name: github-pages
+                url: ${{PAGE_URL}}
+              runs-on: ubuntu-latest
+              needs: build
+              steps:
+                - name: Deploy
+                  id: deployment
+                  uses: actions/deploy-pages@v4
+          ''').replace('${{PAGE_URL}}', '$' + '{{ steps.deployment.outputs.page_url }}')
+
+          workflow_dir = root / '.github' / 'workflows'
+          workflow_dir.mkdir(parents=True, exist_ok=True)
+          (workflow_dir / 'pages.yml').write_text(pages_workflow, encoding='utf-8')
           PY
       - name: Commit source tree
         run: |
