@@ -1,14 +1,13 @@
 import { Activity, Dumbbell, Home, LineChart, Ruler, Settings } from 'lucide-react';
 import { useEffect, useState } from 'react';
-import { useFitnessData } from './hooks/useFitnessData';
+import { BrandWordmark } from './components/BrandWordmark';
 import { brand } from './config/branding';
+import { useFitnessData } from './hooks/useFitnessData';
 import { BodyScreen } from './screens/BodyScreen';
 import { GraphsScreen } from './screens/GraphsScreen';
 import { HomeScreen } from './screens/HomeScreen';
 import { SettingsScreen } from './screens/SettingsScreen';
 import { WorkoutScreen } from './screens/WorkoutScreen';
-
-const appIconUrl = `${import.meta.env.BASE_URL}icons/app-icon.svg`;
 
 const tabs = [
   { id: 'home', label: 'Home', icon: Home },
@@ -58,10 +57,11 @@ export default function App() {
     <div className={data.settings.darkMode ? 'app-shell' : 'app-shell light-mode'}>
       <header className="topbar">
         <div className="brand-lockup">
-          <img className="brand-mark" src={appIconUrl} alt="" aria-hidden="true" />
           <div>
             <p className="eyebrow">{brand.eyebrow}</p>
-            <h1>{brand.name}</h1>
+            <h1>
+              <BrandWordmark />
+            </h1>
           </div>
         </div>
         <div className="status-pill">
@@ -100,10 +100,11 @@ function LoadingScreen() {
   return (
     <section className="stack loading-screen" aria-live="polite">
       <div className="loading-brand">
-        <img className="brand-mark brand-mark-large" src={appIconUrl} alt="" aria-hidden="true" />
         <div>
           <p className="eyebrow">{brand.name}</p>
-          <h2>Loading your progress</h2>
+          <h2>
+            <BrandWordmark />
+          </h2>
         </div>
       </div>
       <div className="skeleton skeleton-title" />

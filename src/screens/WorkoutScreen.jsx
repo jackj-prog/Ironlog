@@ -1,5 +1,6 @@
 import { ArrowLeft, Check, Clock, Dumbbell, Pause, Play, Plus, RefreshCw, Save, TimerReset, Trash2 } from 'lucide-react';
 import { useEffect, useMemo, useRef, useState } from 'react';
+import { DateField } from '../components/DateField';
 import { exerciseSubstitutions, getExerciseSubstitutions, getMovementPattern } from '../config/exerciseSubstitutions';
 import { workoutTemplates } from '../config/workoutTemplates';
 import { toISODate } from '../utils/date';
@@ -534,10 +535,7 @@ export function WorkoutScreen({ addWorkout, settings, workouts }) {
       </article>
 
       <div className="panel workout-meta">
-        <label className="field">
-          <span>Date</span>
-          <input type="date" value={date} onChange={(event) => setDate(event.target.value)} />
-        </label>
+        <DateField value={date} onChange={setDate} />
         <div className="progress-stat">
           <span>Sets complete</span>
           <strong>

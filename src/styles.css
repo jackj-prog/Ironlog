@@ -172,90 +172,69 @@ textarea:focus-visible {
   letter-spacing: 0;
 }
 
-.topbar h1 {
-  font-size: 1.35rem;
-}
-
 .brand-lockup {
   display: inline-flex;
-  align-items: center;
+  align-items: flex-start;
   min-width: 0;
-  gap: 10px;
 }
 
-.brand-mark {
+.topbar h1 {
+  font-size: clamp(2rem, 7.4vw, 2.45rem);
+  line-height: 0.92;
+}
+
+.brand-wordmark {
+  display: inline-flex;
+  align-items: center;
+  color: #edf4ff;
+  font-weight: 900;
+  letter-spacing: 0;
+  line-height: 0.92;
+  white-space: nowrap;
+}
+
+.brand-letter-icon {
   position: relative;
-  display: inline-grid;
-  flex: 0 0 auto;
-  width: 36px;
-  height: 36px;
-  border: 1px solid rgba(96, 165, 250, 0.42);
-  border-radius: 10px;
-  background:
-    linear-gradient(135deg, rgba(45, 212, 191, 0.34), transparent 28%),
-    radial-gradient(circle at 50% 48%, rgba(237, 244, 255, 0.12), transparent 38%),
-    #07111f;
-  box-shadow:
-    inset 0 0 0 1px rgba(237, 244, 255, 0.07),
-    inset 0 0 18px rgba(45, 212, 191, 0.12),
-    0 12px 30px rgba(45, 212, 191, 0.16);
+  display: inline-block;
+  width: 0.72em;
+  height: 0.96em;
+  margin-right: 0.01em;
+  transform: translateY(0.055em);
+  filter: drop-shadow(0 0 10px rgba(45, 212, 191, 0.28));
 }
 
-.brand-mark::before,
-.brand-mark::after {
+.brand-letter-icon::before,
+.brand-letter-icon::after {
   position: absolute;
   content: "";
-  background: #edf4ff;
 }
 
-.brand-mark::before {
-  top: 10px;
-  bottom: 10px;
-  left: 16px;
-  width: 4px;
-  border-radius: 5px;
-  background: linear-gradient(#ffffff, #cdd5df);
-  box-shadow:
-    0 -7px 0 4px #edf4ff,
-    0 7px 0 4px #edf4ff,
-    0 0 12px rgba(237, 244, 255, 0.32);
-}
-
-.brand-mark::after {
-  top: 12px;
-  right: 9px;
-  left: 9px;
-  height: 4px;
+.brand-letter-icon::before {
+  top: 0.22em;
+  bottom: 0.22em;
+  left: 50%;
+  width: 0.17em;
   border-radius: 999px;
-  background: linear-gradient(90deg, #edf4ff, #ffffff, #d8e0ea);
+  background: linear-gradient(#ffffff, #d9e2ec);
+  box-shadow: 0 0 8px rgba(237, 244, 255, 0.28);
+  transform: translateX(-50%);
+}
+
+.brand-letter-icon::after {
+  top: 0.08em;
+  left: 0.13em;
+  right: 0.13em;
+  height: 0.14em;
+  border-radius: 999px;
+  background: linear-gradient(90deg, #dbe7f5, #ffffff, #cbd5e1);
   box-shadow:
-    0 9px 0 #edf4ff,
-    0 18px 0 #edf4ff,
-    -8px 0 0 0 #edf4ff,
-    8px 0 0 0 #edf4ff,
-    -8px 18px 0 0 #edf4ff,
-    8px 18px 0 0 #edf4ff,
-    0 14px 0 -1px #2dd4bf;
-}
-
-.brand-mark-large {
-  width: 52px;
-  height: 52px;
-  border-radius: 14px;
-}
-
-.brand-mark-large::before {
-  top: 15px;
-  bottom: 15px;
-  left: 24px;
-  width: 5px;
-}
-
-.brand-mark-large::after {
-  top: 17px;
-  right: 13px;
-  left: 13px;
-  height: 5px;
+    0 0.68em 0 #e8eef7,
+    -0.1em 0.01em 0 0.05em #f8fafc,
+    0.1em 0.01em 0 0.05em #f8fafc,
+    -0.1em 0.67em 0 0.05em #e7eef7,
+    0.1em 0.67em 0 0.05em #e7eef7,
+    0 0.55em 0 -0.02em #2dd4bf,
+    0 -0.02em 0 -0.03em #2dd4bf;
 }
 
 .eyebrow {
@@ -564,6 +543,8 @@ input {
 }
 
 input[type="date"] {
+  -webkit-appearance: none;
+  appearance: none;
   display: block;
   width: 100%;
   max-width: 100%;
@@ -575,6 +556,67 @@ input[type="date"] {
 input[type="date"]::-webkit-date-and-time-value {
   min-height: 1.4em;
   text-align: left;
+}
+
+.date-field {
+  width: 100%;
+  max-width: 100%;
+}
+
+.date-input-shell {
+  position: relative;
+  display: grid;
+  align-items: center;
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
+  min-height: 46px;
+  overflow: hidden;
+  border: 1px solid #2c3a51;
+  border-radius: 8px;
+  color: #edf4ff;
+  background: #0b1220;
+}
+
+.date-display {
+  display: block;
+  min-width: 0;
+  overflow: hidden;
+  padding: 11px 12px;
+  color: inherit;
+  font-size: 1rem;
+  font-weight: 600;
+  line-height: 1.35;
+  text-align: center;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  pointer-events: none;
+}
+
+.native-date-input {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  max-width: 100%;
+  height: 100%;
+  min-height: 100%;
+  border: 0;
+  margin: 0;
+  padding: 0;
+  opacity: 0.01;
+  color: transparent;
+  background: transparent;
+}
+
+.date-input-shell:focus-within {
+  outline: 2px solid rgba(54, 211, 153, 0.85);
+  outline-offset: 2px;
+}
+
+body.light-mode .date-input-shell {
+  border-color: #c9d3e3;
+  color: #0c1422;
+  background: #ffffff;
 }
 
 textarea {
@@ -745,7 +787,7 @@ textarea {
 
 .workout-meta {
   display: grid;
-  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  grid-template-columns: minmax(0, 1fr);
   gap: 10px;
   align-items: stretch;
 }
@@ -1221,18 +1263,21 @@ body.light-mode .chart-empty-state strong {
 }
 
 @media (max-width: 430px) {
-  .workout-meta {
-    grid-template-columns: 1fr;
-  }
-
   .section-heading select,
   .section-heading input {
     flex: 1 1 160px;
     max-width: 100%;
   }
 
+  .date-input-shell,
   .field input[type="date"] {
     inline-size: 100%;
+  }
+}
+
+@media (min-width: 520px) {
+  .workout-meta {
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
   }
 }
 

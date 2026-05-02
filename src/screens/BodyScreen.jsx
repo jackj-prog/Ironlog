@@ -1,5 +1,6 @@
 import { Check, ClipboardPen, Pencil, Plus, Ruler, Scale, Trash2, X } from 'lucide-react';
 import { useEffect, useMemo, useState } from 'react';
+import { DateField } from '../components/DateField';
 import { measurementFields } from '../config/measurementFields';
 import { formatShortDate, toISODate } from '../utils/date';
 
@@ -137,10 +138,7 @@ function WeightLogPanel({ addWeight, updateWeight, deleteWeight, weights, weight
             </button>
           ) : null}
         </div>
-        <label className="field">
-          <span>Date</span>
-          <input value={date} type="date" onChange={(event) => setDate(event.target.value)} />
-        </label>
+        <DateField value={date} onChange={setDate} />
         <label className="field">
           <span>Bodyweight ({weightUnit})</span>
           <input
@@ -265,10 +263,7 @@ function MeasurementLogPanel({ addMeasurements, updateMeasurements, deleteMeasur
             <ClipboardPen size={18} />
           </button>
         </div>
-        <label className="field">
-          <span>Date</span>
-          <input value={date} type="date" onChange={(event) => setDate(event.target.value)} />
-        </label>
+        <DateField value={date} onChange={setDate} />
         <div className="field-grid measurement-grid">
           {fields.map((field) => (
             <label key={field.id} className="field">
