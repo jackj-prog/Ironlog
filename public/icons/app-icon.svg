@@ -1,0 +1,21 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" role="img" aria-label="IronLog app icon">
+  <defs>
+    <linearGradient id="bg" x1="64" x2="448" y1="32" y2="480" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#102035"/>
+      <stop offset="0.52" stop-color="#080d16"/>
+      <stop offset="1" stop-color="#0d1422"/>
+    </linearGradient>
+    <linearGradient id="glow" x1="112" x2="390" y1="104" y2="406" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#36d399" stop-opacity="0.38"/>
+      <stop offset="1" stop-color="#60a5fa" stop-opacity="0.08"/>
+    </linearGradient>
+  </defs>
+  <rect width="512" height="512" rx="112" fill="url(#bg)"/>
+  <rect x="36" y="36" width="440" height="440" rx="92" fill="url(#glow)" opacity="0.72"/>
+  <rect x="186" y="146" width="54" height="220" rx="27" fill="#36d399"/>
+  <rect x="272" y="146" width="54" height="220" rx="27" fill="#36d399"/>
+  <rect x="148" y="228" width="216" height="56" rx="28" fill="#edf4ff"/>
+  <rect x="104" y="182" width="40" height="148" rx="20" fill="#edf4ff"/>
+  <rect x="368" y="182" width="40" height="148" rx="20" fill="#edf4ff"/>
+  <path d="M164 352h52l26-38 34 72 34-48h50" fill="none" stroke="#60a5fa" stroke-linecap="round" stroke-linejoin="round" stroke-width="24"/>
+</svg>

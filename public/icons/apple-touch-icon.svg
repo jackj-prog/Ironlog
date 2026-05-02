@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 180 180" role="img" aria-label="IronLog iPhone icon">
+  <rect width="180" height="180" rx="38" fill="#080d16"/>
+  <path d="M32 32h116a18 18 0 0 1 18 18v80a18 18 0 0 1-18 18H32V32Z" fill="#0d1422"/>
+  <path d="M68 130V50h18v80H68Zm40 0V50h18v80h-18ZM86 101V79h22v22H86Z" fill="#36d399"/>
+  <path d="M44 116V64h18v52H44Zm74 0V64h18v52h-18Z" fill="#edf4ff"/>
+  <path d="M48 148h30l13-21 18 39 18-26h30" fill="none" stroke="#60a5fa" stroke-linecap="round" stroke-linejoin="round" stroke-width="9"/>
+</svg>
