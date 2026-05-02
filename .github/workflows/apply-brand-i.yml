@@ -15,101 +15,83 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
-      - name: Apply source payload
+      - name: Apply exact brand I
         run: |
           python - <<'PY'
-          import base64
-          import io
-          import zipfile
           from pathlib import Path
 
-          encoded = ''.join(line.strip() for line in """
-          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
-          AAAAAA==
-          """.splitlines())
+          Path('public/icons').mkdir(parents=True, exist_ok=True)
+          Path('public/icons/brand-i.svg').write_text('''<svg xmlns="http://www.w3.org/2000/svg" viewBox="148 96 216 352" role="img" aria-label="IronLog I mark">
+            <defs>
+              <linearGradient id="metal" x1="176" x2="332" y1="92" y2="424" gradientUnits="userSpaceOnUse">
+                <stop stop-color="#ffffff"/>
+                <stop offset="0.52" stop-color="#e6ebf1"/>
+                <stop offset="1" stop-color="#cdd6df"/>
+              </linearGradient>
+              <linearGradient id="teal" x1="196" x2="316" y1="168" y2="344" gradientUnits="userSpaceOnUse">
+                <stop stop-color="#38f5e4"/>
+                <stop offset="1" stop-color="#1a9f9a"/>
+              </linearGradient>
+              <filter id="softShadow" x="-30%" y="-30%" width="160%" height="160%">
+                <feDropShadow dx="0" dy="10" stdDeviation="12" flood-color="#000814" flood-opacity="0.48"/>
+                <feDropShadow dx="0" dy="0" stdDeviation="8" flood-color="#ffffff" flood-opacity="0.12"/>
+              </filter>
+            </defs>
+            <g filter="url(#softShadow)">
+              <rect x="232" y="165" width="48" height="182" rx="10" fill="url(#metal)"/>
+              <rect x="221" y="164" width="70" height="9" rx="4.5" fill="url(#teal)"/>
+              <rect x="221" y="339" width="70" height="9" rx="4.5" fill="url(#teal)"/>
+              <rect x="199" y="112" width="114" height="54" rx="13" fill="url(#metal)"/>
+              <rect x="199" y="177" width="114" height="24" rx="12" fill="url(#metal)"/>
+              <rect x="168" y="123" width="22" height="46" rx="10" fill="url(#metal)"/>
+              <rect x="322" y="123" width="22" height="46" rx="10" fill="url(#metal)"/>
+              <rect x="199" y="346" width="114" height="24" rx="12" fill="url(#metal)"/>
+              <rect x="199" y="381" width="114" height="54" rx="13" fill="url(#metal)"/>
+              <rect x="168" y="381" width="22" height="46" rx="10" fill="url(#metal)"/>
+              <rect x="322" y="381" width="22" height="46" rx="10" fill="url(#metal)"/>
+            </g>
+          </svg>
+          ''', encoding='utf-8')
 
-          with zipfile.ZipFile(io.BytesIO(base64.b64decode(encoded))) as archive:
-              for member in archive.infolist():
-                  target = Path(member.filename)
-                  target.parent.mkdir(parents=True, exist_ok=True)
-                  target.write_bytes(archive.read(member))
+          Path('src/components/BrandWordmark.jsx').write_text('''export function BrandWordmark() {
+            const brandIUrl = `${import.meta.env.BASE_URL}icons/brand-i.svg`;
+
+            return (
+              <span className="brand-wordmark" aria-label="IronLog">
+                <img className="brand-letter-icon" src={brandIUrl} alt="" aria-hidden="true" />
+                <span aria-hidden="true">ronLog</span>
+              </span>
+            );
+          }
+          ''', encoding='utf-8')
+
+          styles_path = Path('src/styles.css')
+          styles = styles_path.read_text(encoding='utf-8')
+          start = styles.index('.brand-letter-icon {')
+          end = styles.index('\n\n.eyebrow', start)
+          styles = styles[:start] + '''.brand-letter-icon {
+            display: inline-block;
+            width: auto;
+            height: 1.08em;
+            margin-right: -0.02em;
+            transform: translateY(0.075em);
+            object-fit: contain;
+          }''' + styles[end:]
+          styles_path.write_text(styles, encoding='utf-8')
+
+          main_path = Path('src/main.jsx')
+          main = main_path.read_text(encoding='utf-8')
+          if 'icons/brand-i.svg' not in main:
+              main = main.replace("assetUrl(`${import.meta.env.BASE_URL}icons/app-icon.svg`),\n", "assetUrl(`${import.meta.env.BASE_URL}icons/app-icon.svg`),\n    assetUrl(`${import.meta.env.BASE_URL}icons/brand-i.svg`),\n")
+          main = main.replace('ironlog-v4', 'ironlog-v5')
+          main_path.write_text(main, encoding='utf-8')
+
+          sw_path = Path('public/service-worker.js')
+          sw = sw_path.read_text(encoding='utf-8')
+          if './icons/brand-i.svg' not in sw:
+              sw = sw.replace("  './icons/app-icon.svg',\n", "  './icons/app-icon.svg',\n  './icons/brand-i.svg',\n")
+          sw = sw.replace('ironlog-v4', 'ironlog-v5')
+          sw_path.write_text(sw, encoding='utf-8')
           PY
       - name: Commit updates
         run: |
