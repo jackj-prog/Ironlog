@@ -106,6 +106,9 @@ textarea {
 input,
 select,
 textarea {
+  box-sizing: border-box;
+  min-width: 0;
+  max-width: 100%;
   font-size: 16px;
 }
 
@@ -460,6 +463,7 @@ textarea:focus-visible {
   display: flex;
   align-items: center;
   justify-content: space-between;
+  flex-wrap: wrap;
   gap: 12px;
 }
 
@@ -551,6 +555,7 @@ body.light-mode .clear-confirm p {
 select,
 input {
   width: 100%;
+  min-height: 46px;
   border: 1px solid #2c3a51;
   border-radius: 8px;
   padding: 11px 12px;
@@ -558,8 +563,24 @@ input {
   background: #0b1220;
 }
 
+input[type="date"] {
+  display: block;
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
+  min-height: 46px;
+  line-height: 1.2;
+}
+
+input[type="date"]::-webkit-date-and-time-value {
+  min-height: 1.4em;
+  text-align: left;
+}
+
 textarea {
   width: 100%;
+  max-width: 100%;
+  min-width: 0;
   min-height: 88px;
   resize: vertical;
   border: 1px solid #2c3a51;
@@ -572,7 +593,7 @@ textarea {
 
 .section-heading select,
 .section-heading input {
-  max-width: 170px;
+  max-width: min(170px, 100%);
 }
 
 .exercise-card {
@@ -719,12 +740,21 @@ textarea {
 .form-panel {
   display: grid;
   gap: 14px;
+  min-width: 0;
 }
 
 .workout-meta {
   display: grid;
-  grid-template-columns: 1fr 1fr;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
   gap: 10px;
+  align-items: stretch;
+}
+
+.field,
+.panel,
+.chart-card,
+.workout-meta > * {
+  min-width: 0;
 }
 
 .workout-engine .section-heading {
@@ -1187,6 +1217,22 @@ body.light-mode .chart-empty-state strong {
 
   .tab {
     font-size: 0.66rem;
+  }
+}
+
+@media (max-width: 430px) {
+  .workout-meta {
+    grid-template-columns: 1fr;
+  }
+
+  .section-heading select,
+  .section-heading input {
+    flex: 1 1 160px;
+    max-width: 100%;
+  }
+
+  .field input[type="date"] {
+    inline-size: 100%;
   }
 }
 
