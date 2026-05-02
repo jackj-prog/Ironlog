@@ -100,14 +100,14 @@ jobs:
             deploy:
               environment:
                 name: github-pages
-                url: ${{PAGE_URL}}
+                url: __PAGE_URL__
               runs-on: ubuntu-latest
               needs: build
               steps:
                 - name: Deploy
                   id: deployment
                   uses: actions/deploy-pages@v4
-          ''').replace('${{PAGE_URL}}', '$' + '{{ steps.deployment.outputs.page_url }}')
+          ''').replace('__PAGE_URL__', '$' + '{{ steps.deployment.outputs.page_url }}')
 
           workflow_dir = root / '.github' / 'workflows'
           workflow_dir.mkdir(parents=True, exist_ok=True)
