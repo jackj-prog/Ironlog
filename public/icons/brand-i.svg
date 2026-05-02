@@ -1,4 +1,4 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="148 96 216 352" role="img" aria-label="IronLog I mark">
+<svg xmlns="http://www.w3.org/2000/svg" width="216" height="352" viewBox="148 96 216 352" preserveAspectRatio="xMidYMid meet" role="img" aria-label="IronLog I mark" shape-rendering="geometricPrecision">
   <defs>
     <linearGradient id="metal" x1="176" x2="332" y1="92" y2="424" gradientUnits="userSpaceOnUse">
       <stop stop-color="#ffffff"/>

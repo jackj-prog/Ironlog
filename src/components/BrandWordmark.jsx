@@ -3,7 +3,16 @@ export function BrandWordmark() {
 
   return (
     <span className="brand-wordmark" aria-label="IronLog">
-      <img className="brand-letter-icon" src={brandIUrl} alt="" aria-hidden="true" />
+      <img
+        className="brand-letter-icon"
+        src={brandIUrl}
+        width="216"
+        height="352"
+        alt=""
+        aria-hidden="true"
+        decoding="async"
+        draggable="false"
+      />
       <span aria-hidden="true">ronLog</span>
     </span>
   );

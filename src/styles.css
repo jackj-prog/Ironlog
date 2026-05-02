@@ -185,21 +185,23 @@ textarea:focus-visible {
 
 .brand-wordmark {
   display: inline-flex;
-  align-items: center;
+  align-items: baseline;
   color: #edf4ff;
   font-weight: 900;
   letter-spacing: 0;
-  line-height: 0.92;
+  line-height: 1;
   white-space: nowrap;
 }
 
 .brand-letter-icon {
   display: inline-block;
-  width: auto;
-  height: 1.08em;
-  margin-right: -0.02em;
-  transform: translateY(0.075em);
+  flex: 0 0 auto;
+  width: 0.56em;
+  height: 0.91em;
+  margin-right: 0.03em;
+  transform: translateY(0.065em);
   object-fit: contain;
+  image-rendering: auto;
 }
 
 .eyebrow {

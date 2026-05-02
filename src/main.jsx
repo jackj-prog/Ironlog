@@ -31,7 +31,7 @@ async function warmOfflineCache() {
     (element) => element.src || element.href,
   );
 
-  const cache = await caches.open('ironlog-v5');
+  const cache = await caches.open('ironlog-v6');
   await Promise.allSettled([...new Set([...coreAssets, ...loadedAssets])].map((url) => cache.add(url)));
 }
 
