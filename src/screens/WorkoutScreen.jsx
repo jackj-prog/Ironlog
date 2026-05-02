@@ -1,6 +1,6 @@
-import { ArrowLeft, Check, Clock, Dumbbell, Pause, Play, RefreshCw, Save, TimerReset } from 'lucide-react';
+import { ArrowLeft, Check, Clock, Dumbbell, Pause, Play, Plus, RefreshCw, Save, TimerReset, Trash2 } from 'lucide-react';
 import { useEffect, useMemo, useRef, useState } from 'react';
-import { getExerciseSubstitutions, getMovementPattern } from '../config/exerciseSubstitutions';
+import { exerciseSubstitutions, getExerciseSubstitutions, getMovementPattern } from '../config/exerciseSubstitutions';
 import { workoutTemplates } from '../config/workoutTemplates';
 import { toISODate } from '../utils/date';
 import { estimateOneRepMax } from '../utils/formulas';
@@ -13,6 +13,26 @@ const warmUpPresets = {
   upper: ['Band pull-aparts 2x20', 'Dead hangs 2x30 sec'],
   lower: ['Hip flexor stretch 2x30 sec', 'Bodyweight squats', 'Dead hangs optional'],
 };
+
+const defaultNewExercise = {
+  name: '',
+  sets: 3,
+  reps: '10',
+  target: 'accessory',
+};
+
+function slugifyExerciseName(name) {
+  return String(name)
+    .trim()
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/^-|-$/g, '');
+}
+
+function positiveInteger(value, fallback) {
+  const number = Number(value);
+  return Number.isFinite(number) && number > 0 ? Math.round(number) : fallback;
+}
 
 function numericTarget(reps) {
   const match = String(reps).match(/\d+/);
@@ -31,14 +51,14 @@ function createSet(exercise, previousSet, shouldOverload, increment) {
 }
 
 function movementKey(exercise) {
-  return getMovementPattern(exercise.id);
+  return exercise.movementPattern ?? getMovementPattern(exercise.baseExerciseId ?? exercise.id);
 }
 
 function findPreviousExercise(workouts, exercise) {
   const key = movementKey(exercise);
-  return workouts
+  return (workouts ?? [])
     .flatMap((workout) =>
-      workout.exercisesCompleted.map((completed) => ({
+      (workout.exercisesCompleted ?? []).map((completed) => ({
         ...completed,
         workoutDate: workout.date,
       })),
@@ -57,33 +77,30 @@ function bestOneRepMaxForExercise(workouts, exercise) {
   const key = movementKey(exercise);
   return Math.max(
     0,
-    ...workouts.flatMap((workout) =>
-      workout.exercisesCompleted
+    ...(workouts ?? []).flatMap((workout) =>
+      (workout.exercisesCompleted ?? [])
         .filter((completed) => (completed.movementPattern ?? completed.baseExerciseId ?? completed.id ?? completed.name) === key)
-        .flatMap((completed) => completed.sets.map((set) => estimateOneRepMax(set.weight, set.reps))),
+        .flatMap((completed) => (completed.sets ?? []).map((set) => estimateOneRepMax(set.weight, set.reps))),
     ),
   );
 }
 
-function buildSets(template, workouts, weightUnit) {
+function buildExerciseSets(exercise, workouts, weightUnit) {
   const increment = weightUnit === 'lb' ? 5 : 2.5;
-  return Object.fromEntries(
-    template.exercises.map((exercise) => {
-      const previous = findPreviousExercise(workouts, exercise);
-      const target = numericTarget(exercise.reps);
-      const shouldOverload = targetAchieved(previous, target, exercise.sets);
-      return [
-        exercise.id,
-        Array.from({ length: exercise.sets }, (_, index) => createSet(exercise, previous?.sets?.[index], shouldOverload, increment)),
-      ];
-    }),
-  );
+  const previous = findPreviousExercise(workouts, exercise);
+  const target = numericTarget(exercise.reps);
+  const shouldOverload = targetAchieved(previous, target, exercise.sets);
+  return Array.from({ length: exercise.sets }, (_, index) => createSet(exercise, previous?.sets?.[index], shouldOverload, increment));
 }
 
-function buildSuggestions(template, workouts, weightUnit) {
+function buildSets(exercises, workouts, weightUnit) {
+  return Object.fromEntries(exercises.map((exercise) => [exercise.id, buildExerciseSets(exercise, workouts, weightUnit)]));
+}
+
+function buildSuggestions(exercises, workouts, weightUnit) {
   const increment = weightUnit === 'lb' ? 5 : 2.5;
   return Object.fromEntries(
-    template.exercises.map((exercise) => {
+    exercises.map((exercise) => {
       const previous = findPreviousExercise(workouts, exercise);
       const target = numericTarget(exercise.reps);
       return [
@@ -96,6 +113,77 @@ function buildSuggestions(template, workouts, weightUnit) {
       ];
     }),
   );
+}
+
+function buildExerciseOptions(workouts) {
+  const options = new Map();
+  const addOption = ({ name, baseExerciseId, movementPattern, target = 'custom' }) => {
+    const cleanName = String(name ?? '').trim();
+    if (!cleanName || cleanName.toLowerCase() === 'weak point block') return;
+    const id = baseExerciseId ?? slugifyExerciseName(cleanName);
+    const key = cleanName.toLowerCase();
+    if (!options.has(key)) {
+      options.set(key, {
+        name: cleanName,
+        baseExerciseId: id,
+        movementPattern: movementPattern ?? getMovementPattern(id),
+        target,
+      });
+    }
+  };
+
+  workoutTemplates.forEach((template) => {
+    template.exercises.forEach((exercise) =>
+      addOption({
+        name: exercise.name,
+        baseExerciseId: exercise.id,
+        movementPattern: movementKey(exercise),
+        target: exercise.target,
+      }),
+    );
+  });
+
+  Object.entries(exerciseSubstitutions).forEach(([baseExerciseId, config]) => {
+    config.options.forEach((name) =>
+      addOption({
+        name,
+        baseExerciseId,
+        movementPattern: config.movementPattern,
+      }),
+    );
+  });
+
+  (workouts ?? []).forEach((workout) => {
+    (workout.exercisesCompleted ?? []).forEach((exercise) =>
+      addOption({
+        name: exercise.name,
+        baseExerciseId: exercise.baseExerciseId ?? exercise.id,
+        movementPattern: exercise.movementPattern,
+        target: 'logged',
+      }),
+    );
+  });
+
+  return [...options.values()].sort((a, b) => a.name.localeCompare(b.name));
+}
+
+function createSessionExercise(input, exerciseOptions, order) {
+  const name = String(input.name ?? '').trim();
+  const option = exerciseOptions.find((item) => item.name.toLowerCase() === name.toLowerCase());
+  const baseExerciseId = option?.baseExerciseId ?? slugifyExerciseName(name);
+  const uniqueId = globalThis.crypto?.randomUUID?.() ?? `${Date.now().toString(36)}-${Math.random().toString(36).slice(2)}`;
+
+  return {
+    id: `custom-${slugifyExerciseName(name)}-${uniqueId}`,
+    baseExerciseId,
+    movementPattern: option?.movementPattern ?? getMovementPattern(baseExerciseId),
+    order,
+    name,
+    sets: positiveInteger(input.sets, 3),
+    reps: String(input.reps || '10'),
+    target: option?.target ?? String(input.target || 'accessory'),
+    custom: true,
+  };
 }
 
 function warmUpsForTemplate(template) {
@@ -122,7 +210,7 @@ function prsHit(exercisesCompleted, previousBests) {
     .map((exercise) => {
       const best = Math.max(...exercise.sets.map((set) => estimateOneRepMax(set.weight, set.reps)));
       if (!best) return null;
-      const previousBest = previousBests[exercise.baseExerciseId] ?? 0;
+      const previousBest = previousBests[exercise.id] ?? previousBests[exercise.baseExerciseId] ?? 0;
       return best > previousBest ? `${exercise.name} ${best}` : null;
     })
     .filter(Boolean);
@@ -132,9 +220,11 @@ export function WorkoutScreen({ addWorkout, settings, workouts }) {
   const [activeTemplateId, setActiveTemplateId] = useState(null);
   const activeTemplate = workoutTemplates.find((item) => item.id === activeTemplateId);
   const [date, setDate] = useState(toISODate());
+  const [sessionExercises, setSessionExercises] = useState([]);
   const [setsByExercise, setSetsByExercise] = useState({});
   const [swapsByExercise, setSwapsByExercise] = useState({});
   const [exerciseNotes, setExerciseNotes] = useState({});
+  const [newExercise, setNewExercise] = useState(defaultNewExercise);
   const [warmUps, setWarmUps] = useState({});
   const [sessionNotes, setSessionNotes] = useState('');
   const [isTimerRunning, setIsTimerRunning] = useState(false);
@@ -144,25 +234,35 @@ export function WorkoutScreen({ addWorkout, settings, workouts }) {
   const [completedSummary, setCompletedSummary] = useState(null);
   const [status, setStatus] = useState('');
 
+  const activeExercises = useMemo(() => {
+    if (!activeTemplate) return [];
+    return sessionExercises.length ? sessionExercises : activeTemplate.exercises;
+  }, [activeTemplate, sessionExercises]);
+
+  const exerciseOptions = useMemo(() => buildExerciseOptions(workouts), [workouts]);
+
   const suggestions = useMemo(() => {
     if (!activeTemplate) return {};
-    return buildSuggestions(activeTemplate, workouts, settings.units.weight);
-  }, [activeTemplate, settings.units.weight, workouts]);
+    return buildSuggestions(activeExercises, workouts, settings.units.weight);
+  }, [activeExercises, activeTemplate, settings.units.weight, workouts]);
 
   const previousBests = useMemo(() => {
     if (!activeTemplate) return {};
-    return Object.fromEntries(activeTemplate.exercises.map((exercise) => [exercise.id, bestOneRepMaxForExercise(workouts, exercise)]));
-  }, [activeTemplate, workouts]);
+    return Object.fromEntries(activeExercises.map((exercise) => [exercise.id, bestOneRepMaxForExercise(workouts, exercise)]));
+  }, [activeExercises, activeTemplate, workouts]);
 
   useEffect(() => {
     try {
       const draft = JSON.parse(localStorage.getItem(DRAFT_KEY) ?? localStorage.getItem(LEGACY_DRAFT_KEY) ?? 'null');
       if (!draft?.activeTemplateId) return;
+      const draftTemplate = workoutTemplates.find((template) => template.id === draft.activeTemplateId);
       setActiveTemplateId(draft.activeTemplateId);
       setDate(draft.date ?? toISODate());
+      setSessionExercises(draft.sessionExercises ?? draftTemplate?.exercises ?? []);
       setSetsByExercise(draft.setsByExercise ?? {});
       setSwapsByExercise(draft.swapsByExercise ?? {});
       setExerciseNotes(draft.exerciseNotes ?? {});
+      setNewExercise(draft.newExercise ?? defaultNewExercise);
       setWarmUps(draft.warmUps ?? {});
       setSessionNotes(draft.sessionNotes ?? '');
       setIsMarkedComplete(Boolean(draft.isMarkedComplete));
@@ -182,9 +282,11 @@ export function WorkoutScreen({ addWorkout, settings, workouts }) {
       JSON.stringify({
         activeTemplateId,
         date,
+        sessionExercises,
         setsByExercise,
         swapsByExercise,
         exerciseNotes,
+        newExercise,
         warmUps,
         sessionNotes,
         isMarkedComplete,
@@ -201,8 +303,10 @@ export function WorkoutScreen({ addWorkout, settings, workouts }) {
     exerciseNotes,
     isMarkedComplete,
     isTimerRunning,
+    newExercise,
     restSeconds,
     sessionNotes,
+    sessionExercises,
     setsByExercise,
     swapsByExercise,
     warmUps,
@@ -226,9 +330,11 @@ export function WorkoutScreen({ addWorkout, settings, workouts }) {
   function startWorkout(template) {
     setActiveTemplateId(template.id);
     setDate(toISODate());
-    setSetsByExercise(buildSets(template, workouts, settings.units.weight));
+    setSessionExercises(template.exercises);
+    setSetsByExercise(buildSets(template.exercises, workouts, settings.units.weight));
     setSwapsByExercise({});
     setExerciseNotes({});
+    setNewExercise(defaultNewExercise);
     setWarmUps(Object.fromEntries(warmUpsForTemplate(template).map((item) => [item, false])));
     setSessionNotes('');
     setElapsedSeconds(0);
@@ -248,7 +354,7 @@ export function WorkoutScreen({ addWorkout, settings, workouts }) {
   function updateSet(exerciseId, index, key, value) {
     setSetsByExercise((current) => ({
       ...current,
-      [exerciseId]: current[exerciseId].map((set, setIndex) => (setIndex === index ? { ...set, [key]: value } : set)),
+      [exerciseId]: (current[exerciseId] ?? []).map((set, setIndex) => (setIndex === index ? { ...set, [key]: value } : set)),
     }));
     setIsMarkedComplete(false);
   }
@@ -256,7 +362,7 @@ export function WorkoutScreen({ addWorkout, settings, workouts }) {
   function toggleSetComplete(exerciseId, index, forceComplete) {
     setSetsByExercise((current) => ({
       ...current,
-      [exerciseId]: current[exerciseId].map((set, setIndex) => {
+      [exerciseId]: (current[exerciseId] ?? []).map((set, setIndex) => {
         if (setIndex !== index) return set;
         const completed = forceComplete ?? !set.completed;
         if (completed && !set.completed) setRestSeconds(DEFAULT_REST_SECONDS);
@@ -281,6 +387,57 @@ export function WorkoutScreen({ addWorkout, settings, workouts }) {
     });
   }
 
+  function updateNewExercise(key, value) {
+    setNewExercise((current) => ({ ...current, [key]: value }));
+  }
+
+  function addExerciseToSession() {
+    if (!newExercise.name.trim()) {
+      setStatus('Choose or enter an exercise first.');
+      return;
+    }
+
+    const exercise = createSessionExercise(newExercise, exerciseOptions, activeExercises.length + 1);
+    setSessionExercises((current) => [...(current.length ? current : activeTemplate.exercises), exercise]);
+    setSetsByExercise((current) => ({
+      ...current,
+      [exercise.id]: buildExerciseSets(exercise, workouts, settings.units.weight),
+    }));
+    setNewExercise(defaultNewExercise);
+    setIsMarkedComplete(false);
+    setStatus(`${exercise.name} added`);
+  }
+
+  function removeExerciseFromSession(exerciseId) {
+    if (activeExercises.length <= 1) {
+      setStatus('Keep at least one exercise in the workout.');
+      return;
+    }
+
+    setSessionExercises((current) =>
+      (current.length ? current : activeTemplate.exercises)
+        .filter((exercise) => exercise.id !== exerciseId)
+        .map((exercise, index) => ({ ...exercise, order: index + 1 })),
+    );
+    setSetsByExercise((current) => {
+      const next = { ...current };
+      delete next[exerciseId];
+      return next;
+    });
+    setSwapsByExercise((current) => {
+      const next = { ...current };
+      delete next[exerciseId];
+      return next;
+    });
+    setExerciseNotes((current) => {
+      const next = { ...current };
+      delete next[exerciseId];
+      return next;
+    });
+    setIsMarkedComplete(false);
+    setStatus('Exercise removed');
+  }
+
   function markWorkoutComplete() {
     setSetsByExercise((current) =>
       Object.fromEntries(Object.entries(current).map(([exerciseId, sets]) => [exerciseId, sets.map((set) => ({ ...set, completed: true }))])),
@@ -291,14 +448,14 @@ export function WorkoutScreen({ addWorkout, settings, workouts }) {
   }
 
   function buildCompletedExercises() {
-    return activeTemplate.exercises
+    return activeExercises
       .map((exercise) => {
         const replacementName = swapsByExercise[exercise.id];
         return {
           id: exercise.id,
-          baseExerciseId: exercise.id,
+          baseExerciseId: exercise.baseExerciseId ?? exercise.id,
           originalName: exercise.name,
-          movementPattern: getMovementPattern(exercise.id),
+          movementPattern: movementKey(exercise),
           wasSwapped: Boolean(replacementName),
           name: replacementName || exercise.name,
           notes: exerciseNotes[exercise.id] ?? '',
@@ -403,11 +560,13 @@ export function WorkoutScreen({ addWorkout, settings, workouts }) {
 
       <WarmUpChecklist warmUps={warmUps} onToggle={(item) => setWarmUps((current) => ({ ...current, [item]: !current[item] }))} />
 
-      {activeTemplate.exercises.map((exercise) => (
+      {activeExercises.map((exercise) => (
         <ExerciseLogger
+          canRemove={activeExercises.length > 1}
           exercise={exercise}
           exerciseNotes={exerciseNotes}
           key={exercise.id}
+          onRemoveExercise={removeExerciseFromSession}
           onSwipeComplete={(index) => toggleSetComplete(exercise.id, index, true)}
           onSwapExercise={swapExercise}
           onToggleSetComplete={toggleSetComplete}
@@ -420,6 +579,13 @@ export function WorkoutScreen({ addWorkout, settings, workouts }) {
           weightUnit={settings.units.weight}
         />
       ))}
+
+      <AddExercisePanel
+        exerciseOptions={exerciseOptions}
+        newExercise={newExercise}
+        onAddExercise={addExerciseToSession}
+        onUpdateNewExercise={updateNewExercise}
+      />
 
       <label className="field panel">
         <span>Session notes</span>
@@ -463,8 +629,10 @@ function WarmUpChecklist({ warmUps, onToggle }) {
 }
 
 function ExerciseLogger({
+  canRemove,
   exercise,
   exerciseNotes,
+  onRemoveExercise,
   onSwipeComplete,
   onSwapExercise,
   onToggleSetComplete,
@@ -476,7 +644,7 @@ function ExerciseLogger({
   swappedName,
   weightUnit,
 }) {
-  const substitutions = getExerciseSubstitutions(exercise.id);
+  const substitutions = getExerciseSubstitutions(exercise.baseExerciseId ?? exercise.id);
   const displayName = swappedName || exercise.name;
 
   return (
@@ -490,7 +658,14 @@ function ExerciseLogger({
             {swappedName ? ` / swapped from ${exercise.name}` : ''}
           </p>
         </div>
-        <span className="target-pill">{previousBest ? `Best ${previousBest}` : exercise.target}</span>
+        <div className="exercise-actions">
+          <span className="target-pill">{previousBest ? `Best ${previousBest}` : exercise.target}</span>
+          {canRemove ? (
+            <button className="icon-button danger" type="button" onClick={() => onRemoveExercise(exercise.id)} aria-label={`Remove ${exercise.name}`}>
+              <Trash2 size={17} />
+            </button>
+          ) : null}
+        </div>
       </div>
 
       <p className="overload-tip">{suggestion}</p>
@@ -533,6 +708,73 @@ function ExerciseLogger({
         <span>Exercise notes</span>
         <textarea value={exerciseNotes[exercise.id] ?? ''} onChange={(event) => onUpdateExerciseNotes(exercise.id, event.target.value)} />
       </label>
+    </article>
+  );
+}
+
+function AddExercisePanel({ exerciseOptions, newExercise, onAddExercise, onUpdateNewExercise }) {
+  const selectedExercise = exerciseOptions.some((option) => option.name === newExercise.name) ? newExercise.name : '';
+
+  return (
+    <article className="panel add-exercise-card">
+      <div>
+        <p className="eyebrow">Customize</p>
+        <h3>Add Exercise</h3>
+      </div>
+
+      <label className="field">
+        <span>Choose exercise</span>
+        <select value={selectedExercise} onChange={(event) => onUpdateNewExercise('name', event.target.value)}>
+          <option value="">Custom exercise</option>
+          {exerciseOptions.map((option) => (
+            <option key={`${option.baseExerciseId}-${option.name}`} value={option.name}>
+              {option.name}
+            </option>
+          ))}
+        </select>
+      </label>
+
+      <label className="field">
+        <span>Exercise name</span>
+        <input
+          list="exercise-options"
+          placeholder="Type any exercise"
+          value={newExercise.name}
+          onChange={(event) => onUpdateNewExercise('name', event.target.value)}
+        />
+        <datalist id="exercise-options">
+          {exerciseOptions.map((option) => (
+            <option key={option.name} value={option.name} />
+          ))}
+        </datalist>
+      </label>
+
+      <div className="exercise-add-grid">
+        <label className="field">
+          <span>Sets</span>
+          <input
+            inputMode="numeric"
+            min="1"
+            type="number"
+            value={newExercise.sets}
+            onChange={(event) => onUpdateNewExercise('sets', event.target.value)}
+          />
+        </label>
+        <label className="field">
+          <span>Target reps</span>
+          <input
+            inputMode="numeric"
+            placeholder="10"
+            value={newExercise.reps}
+            onChange={(event) => onUpdateNewExercise('reps', event.target.value)}
+          />
+        </label>
+      </div>
+
+      <button className="primary-button" type="button" onClick={onAddExercise}>
+        <Plus size={18} />
+        Add exercise
+      </button>
     </article>
   );
 }

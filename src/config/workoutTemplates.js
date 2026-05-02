@@ -56,13 +56,12 @@ export const workoutTemplates = [
   {
     id: 'full-body',
     name: 'Full Body',
-    focus: 'Full body plus weak point block',
-    estimatedMinutes: 55,
+    focus: 'Full body with optional accessories',
+    estimatedMinutes: 45,
     exercises: [
       { id: 'squat-variation', order: 1, name: 'Squat Variation', sets: 3, reps: '8', target: 'lower' },
       { id: 'bench-variation', order: 2, name: 'Bench Variation', sets: 3, reps: '8', target: 'push' },
       { id: 'row-variation', order: 3, name: 'Row Variation', sets: 3, reps: '8', target: 'pull' },
-      { id: 'weak-point-block', order: 4, name: 'Weak Point Block', sets: 1, reps: '20', target: '20 min' },
     ],
   },
 ];

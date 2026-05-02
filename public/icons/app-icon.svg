@@ -1,21 +1,47 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" role="img" aria-label="IronLog app icon">
   <defs>
-    <linearGradient id="bg" x1="64" x2="448" y1="32" y2="480" gradientUnits="userSpaceOnUse">
-      <stop stop-color="#102035"/>
-      <stop offset="0.52" stop-color="#080d16"/>
-      <stop offset="1" stop-color="#0d1422"/>
+    <linearGradient id="shell" x1="78" x2="438" y1="42" y2="468" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#10263a"/>
+      <stop offset="0.5" stop-color="#07111f"/>
+      <stop offset="1" stop-color="#0b1424"/>
     </linearGradient>
-    <linearGradient id="glow" x1="112" x2="390" y1="104" y2="406" gradientUnits="userSpaceOnUse">
-      <stop stop-color="#36d399" stop-opacity="0.38"/>
-      <stop offset="1" stop-color="#60a5fa" stop-opacity="0.08"/>
+    <linearGradient id="edge" x1="86" x2="426" y1="80" y2="432" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#31f2df"/>
+      <stop offset="0.24" stop-color="#28c7bd"/>
+      <stop offset="0.58" stop-color="#4e6f93"/>
+      <stop offset="1" stop-color="#22344f"/>
     </linearGradient>
+    <linearGradient id="metal" x1="176" x2="332" y1="92" y2="424" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#ffffff"/>
+      <stop offset="0.52" stop-color="#e6ebf1"/>
+      <stop offset="1" stop-color="#cdd6df"/>
+    </linearGradient>
+    <linearGradient id="teal" x1="196" x2="316" y1="168" y2="344" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#38f5e4"/>
+      <stop offset="1" stop-color="#1a9f9a"/>
+    </linearGradient>
+    <filter id="softShadow" x="-30%" y="-30%" width="160%" height="160%">
+      <feDropShadow dx="0" dy="10" stdDeviation="12" flood-color="#000814" flood-opacity="0.48"/>
+      <feDropShadow dx="0" dy="0" stdDeviation="8" flood-color="#ffffff" flood-opacity="0.12"/>
+    </filter>
+    <filter id="edgeGlow" x="-30%" y="-30%" width="160%" height="160%">
+      <feDropShadow dx="0" dy="0" stdDeviation="8" flood-color="#2dd4bf" flood-opacity="0.55"/>
+    </filter>
   </defs>
-  <rect width="512" height="512" rx="112" fill="url(#bg)"/>
-  <rect x="36" y="36" width="440" height="440" rx="92" fill="url(#glow)" opacity="0.72"/>
-  <rect x="186" y="146" width="54" height="220" rx="27" fill="#36d399"/>
-  <rect x="272" y="146" width="54" height="220" rx="27" fill="#36d399"/>
-  <rect x="148" y="228" width="216" height="56" rx="28" fill="#edf4ff"/>
-  <rect x="104" y="182" width="40" height="148" rx="20" fill="#edf4ff"/>
-  <rect x="368" y="182" width="40" height="148" rx="20" fill="#edf4ff"/>
-  <path d="M164 352h52l26-38 34 72 34-48h50" fill="none" stroke="#60a5fa" stroke-linecap="round" stroke-linejoin="round" stroke-width="24"/>
+  <rect width="512" height="512" fill="#020712"/>
+  <rect x="62" y="62" width="388" height="388" rx="86" fill="url(#shell)" stroke="url(#edge)" stroke-width="5" filter="url(#edgeGlow)"/>
+  <rect x="73" y="73" width="366" height="366" rx="76" fill="none" stroke="#dbeafe" stroke-opacity="0.08" stroke-width="2"/>
+  <g filter="url(#softShadow)">
+    <rect x="232" y="165" width="48" height="182" rx="10" fill="url(#metal)"/>
+    <rect x="221" y="164" width="70" height="9" rx="4.5" fill="url(#teal)"/>
+    <rect x="221" y="339" width="70" height="9" rx="4.5" fill="url(#teal)"/>
+    <rect x="199" y="112" width="114" height="54" rx="13" fill="url(#metal)"/>
+    <rect x="199" y="177" width="114" height="24" rx="12" fill="url(#metal)"/>
+    <rect x="168" y="123" width="22" height="46" rx="10" fill="url(#metal)"/>
+    <rect x="322" y="123" width="22" height="46" rx="10" fill="url(#metal)"/>
+    <rect x="199" y="346" width="114" height="24" rx="12" fill="url(#metal)"/>
+    <rect x="199" y="381" width="114" height="54" rx="13" fill="url(#metal)"/>
+    <rect x="168" y="381" width="22" height="46" rx="10" fill="url(#metal)"/>
+    <rect x="322" y="381" width="22" height="46" rx="10" fill="url(#metal)"/>
+  </g>
 </svg>

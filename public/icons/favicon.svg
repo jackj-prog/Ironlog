@@ -1,5 +1,15 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-label="IronLog mark">
-  <rect width="64" height="64" rx="14" fill="#080d16"/>
-  <path d="M18 42V22h6v20h-6Zm22 0V22h6v20h-6ZM24 35v-6h16v6H24Z" fill="#36d399"/>
-  <path d="M14 38V26h4v12h-4Zm32 0V26h4v12h-4Z" fill="#edf4ff"/>
+  <rect width="64" height="64" rx="15" fill="#07111f"/>
+  <rect x="3" y="3" width="58" height="58" rx="13" fill="none" stroke="#2dd4bf" stroke-width="2"/>
+  <rect x="28" y="22" width="8" height="20" rx="2" fill="#edf4ff"/>
+  <rect x="22" y="12" width="20" height="8" rx="3" fill="#edf4ff"/>
+  <rect x="22" y="24" width="20" height="4" rx="2" fill="#edf4ff"/>
+  <rect x="18" y="14" width="4" height="8" rx="2" fill="#edf4ff"/>
+  <rect x="42" y="14" width="4" height="8" rx="2" fill="#edf4ff"/>
+  <rect x="24" y="28" width="16" height="3" rx="1.5" fill="#2dd4bf"/>
+  <rect x="24" y="39" width="16" height="3" rx="1.5" fill="#2dd4bf"/>
+  <rect x="22" y="36" width="20" height="4" rx="2" fill="#edf4ff"/>
+  <rect x="22" y="44" width="20" height="8" rx="3" fill="#edf4ff"/>
+  <rect x="18" y="42" width="4" height="8" rx="2" fill="#edf4ff"/>
+  <rect x="42" y="42" width="4" height="8" rx="2" fill="#edf4ff"/>
 </svg>

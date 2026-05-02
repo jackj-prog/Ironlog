@@ -186,12 +186,16 @@ textarea:focus-visible {
   flex: 0 0 auto;
   width: 36px;
   height: 36px;
-  border: 1px solid rgba(54, 211, 153, 0.34);
+  border: 1px solid rgba(96, 165, 250, 0.42);
   border-radius: 10px;
   background:
-    linear-gradient(135deg, rgba(54, 211, 153, 0.2), transparent 42%),
-    #0b1220;
-  box-shadow: inset 0 0 0 1px rgba(237, 244, 255, 0.04), 0 12px 30px rgba(54, 211, 153, 0.14);
+    linear-gradient(135deg, rgba(45, 212, 191, 0.34), transparent 28%),
+    radial-gradient(circle at 50% 48%, rgba(237, 244, 255, 0.12), transparent 38%),
+    #07111f;
+  box-shadow:
+    inset 0 0 0 1px rgba(237, 244, 255, 0.07),
+    inset 0 0 18px rgba(45, 212, 191, 0.12),
+    0 12px 30px rgba(45, 212, 191, 0.16);
 }
 
 .brand-mark::before,
@@ -202,23 +206,33 @@ textarea:focus-visible {
 }
 
 .brand-mark::before {
-  top: 17px;
+  top: 10px;
+  bottom: 10px;
+  left: 16px;
+  width: 4px;
+  border-radius: 5px;
+  background: linear-gradient(#ffffff, #cdd5df);
+  box-shadow:
+    0 -7px 0 4px #edf4ff,
+    0 7px 0 4px #edf4ff,
+    0 0 12px rgba(237, 244, 255, 0.32);
+}
+
+.brand-mark::after {
+  top: 12px;
   right: 9px;
   left: 9px;
   height: 4px;
   border-radius: 999px;
-}
-
-.brand-mark::after {
-  top: 10px;
-  bottom: 10px;
-  left: 15px;
-  width: 6px;
-  border-radius: 999px;
-  background: #36d399;
+  background: linear-gradient(90deg, #edf4ff, #ffffff, #d8e0ea);
   box-shadow:
-    -8px 3px 0 -2px #edf4ff,
-    8px 3px 0 -2px #edf4ff;
+    0 9px 0 #edf4ff,
+    0 18px 0 #edf4ff,
+    -8px 0 0 0 #edf4ff,
+    8px 0 0 0 #edf4ff,
+    -8px 18px 0 0 #edf4ff,
+    8px 18px 0 0 #edf4ff,
+    0 14px 0 -1px #2dd4bf;
 }
 
 .brand-mark-large {
@@ -228,17 +242,17 @@ textarea:focus-visible {
 }
 
 .brand-mark-large::before {
-  top: 24px;
-  right: 12px;
-  left: 12px;
-  height: 5px;
+  top: 15px;
+  bottom: 15px;
+  left: 24px;
+  width: 5px;
 }
 
 .brand-mark-large::after {
-  top: 14px;
-  bottom: 14px;
-  left: 23px;
-  width: 7px;
+  top: 17px;
+  right: 13px;
+  left: 13px;
+  height: 5px;
 }
 
 .eyebrow {
@@ -513,6 +527,7 @@ body.light-mode .clear-confirm p {
 
 .template-card h3,
 .exercise-card h3,
+.add-exercise-card h3,
 .history-list h3,
 .danger-zone h3,
 .chart-card h3 {
@@ -563,6 +578,24 @@ textarea {
 .exercise-card {
   display: grid;
   gap: 12px;
+}
+
+.exercise-actions {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.add-exercise-card {
+  display: grid;
+  gap: 12px;
+  border-color: rgba(45, 212, 191, 0.34);
+}
+
+.exercise-add-grid {
+  display: grid;
+  grid-template-columns: 0.8fr 1.2fr;
+  gap: 10px;
 }
 
 .set-grid,

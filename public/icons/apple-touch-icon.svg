@@ -1,7 +1,31 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 180 180" role="img" aria-label="IronLog iPhone icon">
-  <rect width="180" height="180" rx="38" fill="#080d16"/>
-  <path d="M32 32h116a18 18 0 0 1 18 18v80a18 18 0 0 1-18 18H32V32Z" fill="#0d1422"/>
-  <path d="M68 130V50h18v80H68Zm40 0V50h18v80h-18ZM86 101V79h22v22H86Z" fill="#36d399"/>
-  <path d="M44 116V64h18v52H44Zm74 0V64h18v52h-18Z" fill="#edf4ff"/>
-  <path d="M48 148h30l13-21 18 39 18-26h30" fill="none" stroke="#60a5fa" stroke-linecap="round" stroke-linejoin="round" stroke-width="9"/>
+  <defs>
+    <linearGradient id="shell" x1="24" x2="156" y1="18" y2="164" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#10263a"/>
+      <stop offset="0.55" stop-color="#07111f"/>
+      <stop offset="1" stop-color="#0b1424"/>
+    </linearGradient>
+    <linearGradient id="edge" x1="24" x2="156" y1="24" y2="156" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#31f2df"/>
+      <stop offset="0.55" stop-color="#4e6f93"/>
+      <stop offset="1" stop-color="#22344f"/>
+    </linearGradient>
+    <linearGradient id="metal" x1="58" x2="122" y1="35" y2="150" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#ffffff"/>
+      <stop offset="1" stop-color="#cdd6df"/>
+    </linearGradient>
+  </defs>
+  <rect width="180" height="180" fill="#020712"/>
+  <rect x="20" y="20" width="140" height="140" rx="34" fill="url(#shell)" stroke="url(#edge)" stroke-width="3"/>
+  <rect x="81" y="61" width="18" height="58" rx="5" fill="url(#metal)"/>
+  <rect x="72" y="40" width="36" height="21" rx="6" fill="url(#metal)"/>
+  <rect x="72" y="67" width="36" height="9" rx="4.5" fill="url(#metal)"/>
+  <rect x="60" y="45" width="8" height="18" rx="4" fill="url(#metal)"/>
+  <rect x="112" y="45" width="8" height="18" rx="4" fill="url(#metal)"/>
+  <rect x="77" y="63" width="26" height="4" rx="2" fill="#2dd4bf"/>
+  <rect x="77" y="116" width="26" height="4" rx="2" fill="#2dd4bf"/>
+  <rect x="72" y="119" width="36" height="9" rx="4.5" fill="url(#metal)"/>
+  <rect x="72" y="133" width="36" height="21" rx="6" fill="url(#metal)"/>
+  <rect x="60" y="133" width="8" height="18" rx="4" fill="url(#metal)"/>
+  <rect x="112" y="133" width="8" height="18" rx="4" fill="url(#metal)"/>
 </svg>

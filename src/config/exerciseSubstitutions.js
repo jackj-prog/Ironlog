@@ -99,10 +99,6 @@ export const exerciseSubstitutions = {
     movementPattern: 'horizontal-press',
     options: ['Bench Press', 'Dumbbell Bench', 'Machine Chest Press', 'Smith Bench'],
   },
-  'weak-point-block': {
-    movementPattern: 'weak-point',
-    options: ['Rear Delt Block', 'Arm Block', 'Core Block', 'Calf Block'],
-  },
 };
 
 export function getExerciseSubstitutions(exerciseId) {
