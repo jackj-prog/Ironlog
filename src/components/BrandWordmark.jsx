@@ -1,7 +1,9 @@
 export function BrandWordmark() {
+  const brandIUrl = `${import.meta.env.BASE_URL}icons/brand-i.svg`;
+
   return (
     <span className="brand-wordmark" aria-label="IronLog">
-      <span className="brand-letter-icon" aria-hidden="true" />
+      <img className="brand-letter-icon" src={brandIUrl} alt="" aria-hidden="true" />
       <span aria-hidden="true">ronLog</span>
     </span>
   );

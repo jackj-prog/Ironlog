@@ -1,10 +1,11 @@
-const CACHE_NAME = 'ironlog-v4';
+const CACHE_NAME = 'ironlog-v5';
 const CORE_ASSETS = [
   './',
   './manifest.webmanifest',
   './icons/favicon.svg',
   './icons/apple-touch-icon.svg',
   './icons/app-icon.svg',
+  './icons/brand-i.svg',
 ];
 
 self.addEventListener('install', (event) => {

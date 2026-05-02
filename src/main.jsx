@@ -24,13 +24,14 @@ async function warmOfflineCache() {
     assetUrl(`${import.meta.env.BASE_URL}icons/favicon.svg`),
     assetUrl(`${import.meta.env.BASE_URL}icons/apple-touch-icon.svg`),
     assetUrl(`${import.meta.env.BASE_URL}icons/app-icon.svg`),
+    assetUrl(`${import.meta.env.BASE_URL}icons/brand-i.svg`),
   ];
 
   const loadedAssets = Array.from(document.querySelectorAll('script[src], link[rel="stylesheet"][href]')).map(
     (element) => element.src || element.href,
   );
 
-  const cache = await caches.open('ironlog-v4');
+  const cache = await caches.open('ironlog-v5');
   await Promise.allSettled([...new Set([...coreAssets, ...loadedAssets])].map((url) => cache.add(url)));
 }
 
