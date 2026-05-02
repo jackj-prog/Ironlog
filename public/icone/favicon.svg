@@ -1,0 +1,5 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-label="IronLog mark">
+  <rect width="64" height="64" rx="14" fill="#080d16"/>
+  <path d="M18 42V22h6v20h-6Zm22 0V22h6v20h-6ZM24 35v-6h16v6H24Z" fill="#36d399"/>
+  <path d="M14 38V26h4v12h-4Zm32 0V26h4v12h-4Z" fill="#edf4ff"/>
+</svg>
