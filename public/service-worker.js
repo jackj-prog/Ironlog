@@ -1,4 +1,4 @@
-const CACHE_NAME = 'ironlog-v2';
+const CACHE_NAME = 'ironlog-v3';
 const CORE_ASSETS = [
   './',
   './manifest.webmanifest',
@@ -8,7 +8,18 @@ const CORE_ASSETS = [
 ];
 
 self.addEventListener('install', (event) => {
-  event.waitUntil(caches.open(CACHE_NAME).then((cache) => cache.addAll(CORE_ASSETS)));
+  event.waitUntil(
+    caches.open(CACHE_NAME).then((cache) =>
+      Promise.allSettled(
+        CORE_ASSETS.map((asset) =>
+          fetch(asset, { cache: 'reload' }).then((response) => {
+            if (response.ok) return cache.put(asset, response);
+            return cache.add(asset);
+          }),
+        ),
+      ),
+    ),
+  );
   self.skipWaiting();
 });
 
