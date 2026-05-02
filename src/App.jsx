@@ -82,7 +82,7 @@ export default function App() {
               type="button"
               aria-current={activeTab === tab.id ? 'page' : undefined}
               title={tab.label}
-              onClick={() => setActiveTab(tab.id)}
+              onClick={() => openTab(tab.id)}
             >
               <Icon size={20} />
               <span>{tab.label}</span>
