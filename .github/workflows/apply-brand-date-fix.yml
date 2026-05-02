@@ -1,0 +1,357 @@
+name: Apply IronLog brand and date fixes
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  apply:
+    if: github.actor != 'github-actions[bot]'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Patch brand wordmark and date fields
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+
+          def write(path, content):
+              target = Path(path)
+              target.parent.mkdir(parents=True, exist_ok=True)
+              target.write_text(content, encoding='utf-8')
+
+          def replace_once(text, old, new, label):
+              if old in text:
+                  return text.replace(old, new, 1)
+              if new in text:
+                  return text
+              raise SystemExit(f'Missing expected block: {label}')
+
+          write('src/components/BrandWordmark.jsx', """export function BrandWordmark() {
+  return (
+    <span className=\"brand-wordmark\" aria-label=\"IronLog\">
+      <span className=\"brand-letter-icon\" aria-hidden=\"true\" />
+      <span aria-hidden=\"true\">ronLog</span>
+    </span>
+  );
+}
+""")
+
+          write('src/components/DateField.jsx', """import { formatLongDate } from '../utils/date';
+
+export function DateField({ label = 'Date', value, onChange }) {
+  return (
+    <label className=\"field date-field\">
+      <span>{label}</span>
+      <span className=\"date-input-shell\">
+        <span className=\"date-display\">{formatLongDate(value)}</span>
+        <input
+          aria-label={label}
+          className=\"native-date-input\"
+          type=\"date\"
+          value={value}
+          onChange={(event) => onChange(event.target.value)}
+        />
+      </span>
+    </label>
+  );
+}
+""")
+
+          path = Path('src/utils/date.js')
+          text = path.read_text(encoding='utf-8')
+          text = replace_once(text,
+              """export function formatShortDate(value) {
+  if (!value) return 'Not logged';
+  return new Intl.DateTimeFormat('en', { month: 'short', day: 'numeric' }).format(new Date(value));
+}
+""",
+              """function parseISODate(value) {
+  if (!value) return null;
+  const [year, month, day] = value.split('-').map(Number);
+  if (!year || !month || !day) return null;
+  return new Date(year, month - 1, day);
+}
+
+export function formatShortDate(value) {
+  if (!value) return 'Not logged';
+  return new Intl.DateTimeFormat('en', { month: 'short', day: 'numeric' }).format(parseISODate(value));
+}
+
+export function formatLongDate(value) {
+  if (!value) return 'Select date';
+  return new Intl.DateTimeFormat('en-GB', { day: 'numeric', month: 'long', year: 'numeric' }).format(parseISODate(value));
+}
+""", 'date utils')
+          path.write_text(text, encoding='utf-8')
+
+          path = Path('src/App.jsx')
+          text = path.read_text(encoding='utf-8')
+          text = replace_once(text,
+              """import { useFitnessData } from './hooks/useFitnessData';
+import { brand } from './config/branding';
+""",
+              """import { BrandWordmark } from './components/BrandWordmark';
+import { brand } from './config/branding';
+import { useFitnessData } from './hooks/useFitnessData';
+""", 'App imports')
+          text = text.replace("const appIconUrl = `${import.meta.env.BASE_URL}icons/app-icon.svg`;\n\n", "")
+          text = replace_once(text,
+              """        <div className=\"brand-lockup\">
+          <img className=\"brand-mark\" src={appIconUrl} alt=\"\" aria-hidden=\"true\" />
+          <div>
+            <p className=\"eyebrow\">{brand.eyebrow}</p>
+            <h1>{brand.name}</h1>
+          </div>
+        </div>
+""",
+              """        <div className=\"brand-lockup\">
+          <div>
+            <p className=\"eyebrow\">{brand.eyebrow}</p>
+            <h1>
+              <BrandWordmark />
+            </h1>
+          </div>
+        </div>
+""", 'header wordmark')
+          text = replace_once(text,
+              """      <div className=\"loading-brand\">
+        <img className=\"brand-mark brand-mark-large\" src={appIconUrl} alt=\"\" aria-hidden=\"true\" />
+        <div>
+          <p className=\"eyebrow\">{brand.name}</p>
+          <h2>Loading your progress</h2>
+        </div>
+      </div>
+""",
+              """      <div className=\"loading-brand\">
+        <div>
+          <p className=\"eyebrow\">{brand.name}</p>
+          <h2>
+            <BrandWordmark />
+          </h2>
+        </div>
+      </div>
+""", 'loading wordmark')
+          path.write_text(text, encoding='utf-8')
+
+          path = Path('src/screens/WorkoutScreen.jsx')
+          text = path.read_text(encoding='utf-8')
+          text = replace_once(text,
+              """import { useEffect, useMemo, useRef, useState } from 'react';
+import { exerciseSubstitutions, getExerciseSubstitutions, getMovementPattern } from '../config/exerciseSubstitutions';
+""",
+              """import { useEffect, useMemo, useRef, useState } from 'react';
+import { DateField } from '../components/DateField';
+import { exerciseSubstitutions, getExerciseSubstitutions, getMovementPattern } from '../config/exerciseSubstitutions';
+""", 'Workout import')
+          text = replace_once(text,
+              """        <label className=\"field\">
+          <span>Date</span>
+          <input type=\"date\" value={date} onChange={(event) => setDate(event.target.value)} />
+        </label>
+""",
+              """        <DateField value={date} onChange={setDate} />
+""", 'Workout date field')
+          path.write_text(text, encoding='utf-8')
+
+          path = Path('src/screens/BodyScreen.jsx')
+          text = path.read_text(encoding='utf-8')
+          text = replace_once(text,
+              """import { useEffect, useMemo, useState } from 'react';
+import { measurementFields } from '../config/measurementFields';
+""",
+              """import { useEffect, useMemo, useState } from 'react';
+import { DateField } from '../components/DateField';
+import { measurementFields } from '../config/measurementFields';
+""", 'Body import')
+          text = text.replace("""        <label className=\"field\">
+          <span>Date</span>
+          <input value={date} type=\"date\" onChange={(event) => setDate(event.target.value)} />
+        </label>
+""", """        <DateField value={date} onChange={setDate} />
+""")
+          path.write_text(text, encoding='utf-8')
+
+          path = Path('src/styles.css')
+          text = path.read_text(encoding='utf-8')
+          start = text.index('.topbar h1 {\n  font-size: 1.35rem;\n}\n\n.brand-lockup')
+          end = text.index('\n\n.eyebrow', start)
+          brand_css = """.brand-lockup {
+  display: inline-flex;
+  align-items: flex-start;
+  min-width: 0;
+}
+
+.topbar h1 {
+  font-size: clamp(2rem, 7.4vw, 2.45rem);
+  line-height: 0.92;
+}
+
+.brand-wordmark {
+  display: inline-flex;
+  align-items: center;
+  color: #edf4ff;
+  font-weight: 900;
+  letter-spacing: 0;
+  line-height: 0.92;
+  white-space: nowrap;
+}
+
+.brand-letter-icon {
+  position: relative;
+  display: inline-block;
+  width: 0.72em;
+  height: 0.96em;
+  margin-right: 0.01em;
+  transform: translateY(0.055em);
+  filter: drop-shadow(0 0 10px rgba(45, 212, 191, 0.28));
+}
+
+.brand-letter-icon::before,
+.brand-letter-icon::after {
+  position: absolute;
+  content: "";
+}
+
+.brand-letter-icon::before {
+  top: 0.22em;
+  bottom: 0.22em;
+  left: 50%;
+  width: 0.17em;
+  border-radius: 999px;
+  background: linear-gradient(#ffffff, #d9e2ec);
+  box-shadow: 0 0 8px rgba(237, 244, 255, 0.28);
+  transform: translateX(-50%);
+}
+
+.brand-letter-icon::after {
+  top: 0.08em;
+  left: 0.13em;
+  right: 0.13em;
+  height: 0.14em;
+  border-radius: 999px;
+  background: linear-gradient(90deg, #dbe7f5, #ffffff, #cbd5e1);
+  box-shadow:
+    0 0.68em 0 #e8eef7,
+    -0.1em 0.01em 0 0.05em #f8fafc,
+    0.1em 0.01em 0 0.05em #f8fafc,
+    -0.1em 0.67em 0 0.05em #e7eef7,
+    0.1em 0.67em 0 0.05em #e7eef7,
+    0 0.55em 0 -0.02em #2dd4bf,
+    0 -0.02em 0 -0.03em #2dd4bf;
+}"""
+          text = text[:start] + brand_css + text[end:]
+          text = replace_once(text,
+              """input[type=\"date\"] {
+  display: block;
+""",
+              """input[type=\"date\"] {
+  -webkit-appearance: none;
+  appearance: none;
+  display: block;
+""", 'date appearance')
+          text = replace_once(text,
+              """input[type=\"date\"]::-webkit-date-and-time-value {
+  min-height: 1.4em;
+  text-align: left;
+}
+
+textarea {
+""",
+              """input[type=\"date\"]::-webkit-date-and-time-value {
+  min-height: 1.4em;
+  text-align: left;
+}
+
+.date-field {
+  width: 100%;
+  max-width: 100%;
+}
+
+.date-input-shell {
+  position: relative;
+  display: grid;
+  align-items: center;
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
+  min-height: 46px;
+  overflow: hidden;
+  border: 1px solid #2c3a51;
+  border-radius: 8px;
+  color: #edf4ff;
+  background: #0b1220;
+}
+
+.date-display {
+  display: block;
+  min-width: 0;
+  overflow: hidden;
+  padding: 11px 12px;
+  text-align: center;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  pointer-events: none;
+}
+
+.native-date-input {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  max-width: 100%;
+  height: 100%;
+  min-height: 100%;
+  border: 0;
+  margin: 0;
+  padding: 0;
+  opacity: 0.01;
+  color: transparent;
+  background: transparent;
+}
+
+.date-input-shell:focus-within {
+  outline: 2px solid rgba(54, 211, 153, 0.85);
+  outline-offset: 2px;
+}
+
+body.light-mode .date-input-shell {
+  border-color: #c9d3e3;
+  color: #0c1422;
+  background: #ffffff;
+}
+
+textarea {
+""", 'date shell styles')
+          text = replace_once(text,
+              """  .field input[type=\"date\"] {
+    inline-size: 100%;
+  }
+""",
+              """  .date-input-shell,
+  .field input[type=\"date\"] {
+    inline-size: 100%;
+  }
+""", 'mobile date shell')
+          path.write_text(text, encoding='utf-8')
+
+          for file in ('src/main.jsx', 'public/service-worker.js'):
+              path = Path(file)
+              text = path.read_text(encoding='utf-8').replace('ironlog-v3', 'ironlog-v4')
+              path.write_text(text, encoding='utf-8')
+          PY
+      - name: Commit updates
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add src/components/BrandWordmark.jsx src/components/DateField.jsx src/App.jsx src/screens/WorkoutScreen.jsx src/screens/BodyScreen.jsx src/utils/date.js src/styles.css src/main.jsx public/service-worker.js
+          if git diff --cached --quiet; then
+            echo "No brand/date changes to commit"
+          else
+            git commit -m "Fix brand wordmark and iPhone date fields"
+            git push
+          fi
