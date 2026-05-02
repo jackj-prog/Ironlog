@@ -196,12 +196,19 @@ textarea:focus-visible {
 .brand-letter-icon {
   display: inline-block;
   flex: 0 0 auto;
-  width: 0.56em;
-  height: 0.91em;
-  margin-right: 0.03em;
-  transform: translateY(0.065em);
-  object-fit: contain;
-  image-rendering: auto;
+  width: 0.5em;
+  height: 0.84em;
+  margin-right: 0.06em;
+  transform: translateY(0.055em);
+  overflow: visible;
+}
+
+.brand-letter-metal {
+  fill: currentColor;
+}
+
+.brand-letter-accent {
+  fill: #37d6ca;
 }
 
 .eyebrow {
