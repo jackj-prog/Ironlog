@@ -8,6 +8,8 @@ import { HomeScreen } from './screens/HomeScreen';
 import { SettingsScreen } from './screens/SettingsScreen';
 import { WorkoutScreen } from './screens/WorkoutScreen';
 
+const appIconUrl = `${import.meta.env.BASE_URL}icons/app-icon.svg`;
+
 const tabs = [
   { id: 'home', label: 'Home', icon: Home },
   { id: 'workout', label: 'Workout', icon: Dumbbell },
@@ -56,7 +58,7 @@ export default function App() {
     <div className={data.settings.darkMode ? 'app-shell' : 'app-shell light-mode'}>
       <header className="topbar">
         <div className="brand-lockup">
-          <span className="brand-mark" aria-hidden="true" />
+          <img className="brand-mark" src={appIconUrl} alt="" aria-hidden="true" />
           <div>
             <p className="eyebrow">{brand.eyebrow}</p>
             <h1>{brand.name}</h1>
@@ -98,7 +100,7 @@ function LoadingScreen() {
   return (
     <section className="stack loading-screen" aria-live="polite">
       <div className="loading-brand">
-        <span className="brand-mark brand-mark-large" aria-hidden="true" />
+        <img className="brand-mark brand-mark-large" src={appIconUrl} alt="" aria-hidden="true" />
         <div>
           <p className="eyebrow">{brand.name}</p>
           <h2>Loading your progress</h2>
