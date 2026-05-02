@@ -5,21 +5,12 @@ import './styles.css';
 
 const rootElement = document.getElementById('root');
 
-createRoot(rootElement).render(
-  <React.StrictMode>
-    <App />
-  </React.StrictMode>,
-);
-
-if ('serviceWorker' in navigator && import.meta.env.PROD) {
-  window.addEventListener('load', async () => {
-    try {
-      const registrations = await navigator.serviceWorker.getRegistrations();
-      await Promise.all(registrations.map((registration) => registration.unregister()));
-      const keys = await caches.keys();
-      await Promise.all(keys.filter((key) => key.startsWith('ironlog-')).map((key) => caches.delete(key)));
-    } catch {
-      // Ignore cleanup failures. The app must never fail to boot because of offline cache handling.
-    }
-  });
+if (rootElement) {
+  createRoot(rootElement).render(
+    <React.StrictMode>
+      <App />
+    </React.StrictMode>,
+  );
+} else {
+  document.body.innerHTML = '<main style="min-height:100vh;background:#080d16;color:white;font-family:system-ui;padding:24px"><h1>IronLog launch error</h1><p>Root element missing.</p></main>';
 }
